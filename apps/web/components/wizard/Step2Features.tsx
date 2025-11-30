@@ -1,10 +1,9 @@
-import { motion } from 'framer-motion';
-import { Check, HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import clsx from 'clsx';
 
 interface Step2Props {
   options: Record<string, boolean>;
-  onChange: (key: string, value: boolean) => void;
+  onChange: (_key: string, _value: boolean) => void;
 }
 
 const features = [

@@ -1,41 +1,128 @@
-# BuildBot
+# BuildBot - CDN-Only Architecture
 
-BuildBot is a developer productivity tool that allows users to instantly generate starter project templates (Next.js, React, Node API, etc.) directly in the browser.
+BuildBot now uses a **CDN-only architecture** for template delivery. Templates are no longer bundled with the web application.
 
-## Features
+## Why CDN-Only?
 
-- **Instant Generation**: Create projects in seconds.
-- **Customizable**: Choose your stack and options (TypeScript, Tailwind, etc.).
-- **Clean Code**: Templates follow best practices.
-- **Monorepo Ready**: Built for scalability.
+✅ **Smaller Bundle Size** - Web app is much lighter  
+✅ **Faster Updates** - Update templates without redeploying  
+✅ **Better Scalability** - CDN handles millions of requests  
+✅ **Version Control** - Easy to version and rollback templates  
+✅ **Global Performance** - Edge caching for fast delivery worldwide  
 
-## Quick Start
+## Setup Required
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/PrathameshAdate05/BuildBot.git
-   ```
+### 1. Build Templates
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm run build:cdn
+```
 
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
+This creates `cdn-templates/` directory with JSON files.
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+### 2. Deploy to CDN
 
-## Architecture
+**Option A: GitHub + jsDelivr (Recommended - Free)**
 
-See [Architecture Overview](docs/architecture.md).
+```bash
+cd cdn-templates
+git init
+git add .
+git commit -m "BuildBot templates"
+git remote add origin https://github.com/YOUR_USERNAME/buildbot-templates.git
+git push -u origin main
+```
 
-## Contributing
+**Option B: Other CDN providers**
 
-See [Contribution Guide](docs/contribution.md).
+See [docs/cdn-deployment.md](./docs/cdn-deployment.md) for Vercel Blob, Cloudflare R2, or AWS S3.
 
-## License
+### 3. Configure Environment
 
-MIT
+Create `apps/web/.env.local`:
+
+```bash
+# For GitHub + jsDelivr
+NEXT_PUBLIC_TEMPLATE_CDN=https://cdn.jsdelivr.net/gh/YOUR_USERNAME/buildbot-templates@main
+```
+
+### 4. Start Development
+
+```bash
+npm run dev
+```
+
+## Template Structure
+
+Templates are stored as JSON files in the CDN:
+
+```
+cdn-templates/
+├── latest/
+│   ├── nextjs-starter.json
+│   ├── react-spa.json
+│   └── node-express.json
+└── versions.json
+```
+
+Each JSON file contains an array of template files with their paths and contents.
+
+## Updating Templates
+
+1. Modify templates in `packages/templates/`
+2. Run `npm run build:cdn`
+3. Push `cdn-templates/` to your CDN repository
+4. Changes are live immediately (respects CDN cache TTL)
+
+## Troubleshooting
+
+### "NEXT_PUBLIC_TEMPLATE_CDN is not configured"
+
+Set the environment variable in `apps/web/.env.local`:
+
+```bash
+NEXT_PUBLIC_TEMPLATE_CDN=https://your-cdn-url.com
+```
+
+### Templates not loading
+
+1. Check CDN URL is correct
+2. Verify templates are deployed to CDN
+3. Check browser console for errors
+4. Test CDN URL directly in browser
+
+### CDN is slow
+
+1. Use a CDN with edge locations near your users
+2. Enable compression (gzip/brotli)
+3. Set appropriate cache headers
+4. Consider using multiple CDN providers
+
+## Development
+
+For local development, you can use the built templates:
+
+```bash
+# Build templates
+npm run build:cdn
+
+# Serve locally (in another terminal)
+cd cdn-templates
+npx serve -p 3001
+
+# Configure .env.local
+NEXT_PUBLIC_TEMPLATE_CDN=http://localhost:3001
+```
+
+## Production Deployment
+
+1. Deploy templates to production CDN
+2. Set `NEXT_PUBLIC_TEMPLATE_CDN` in Vercel/production environment
+3. Deploy web app
+4. Templates are fetched from CDN on demand
+
+## Cost
+
+Using GitHub + jsDelivr is **100% free** with unlimited bandwidth.
+
+For other providers, see [docs/cdn-deployment.md](./docs/cdn-deployment.md) for cost comparison.

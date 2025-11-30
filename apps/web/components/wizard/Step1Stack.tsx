@@ -1,18 +1,19 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import clsx from 'clsx';
+import { ReactNode } from 'react';
 
 interface StackOption {
   id: string;
   name: string;
   desc: string;
-  icon: React.ReactNode; // Placeholder for now
+  icon: ReactNode;
   disabled?: boolean;
 }
 
 interface Step1Props {
   selected: string;
-  onSelect: (id: string) => void;
+  onSelect: (_id: string) => void;
 }
 
 const stacks: StackOption[] = [

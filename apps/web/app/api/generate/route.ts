@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { loadTemplate } from '@/lib/templateLoader';
+import { fetchTemplate } from '@/lib/templateFetcher';
 import { renderTemplate } from '@/lib/templateRenderer';
 import { createZip } from '@/lib/zipCreator';
 
 const generateSchema = z.object({
   template: z.enum(['nextjs-starter', 'react-spa', 'node-express']),
   projectName: z.string().min(1).max(50).regex(/^[a-zA-Z0-9-]+$/, 'Only alphanumeric characters and hyphens are allowed'),
+  description: z.string().optional(),
+  license: z.string().optional(),
+  packageManager: z.string().optional(),
+  gitInit: z.boolean().optional(),
   options: z.record(z.string(), z.boolean()).optional(),
+  settings: z.object({
+    folderStructure: z.string().optional(),
+    lintRules: z.string().optional(),
+    styling: z.string().optional(),
+    fileNaming: z.string().optional(),
+  }).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -21,11 +31,11 @@ export async function POST(req: NextRequest) {
 
     const { template, projectName, options } = result.data;
 
-    // Load template files
-    const files = await loadTemplate(template);
+    // Fetch template (tries CDN first, falls back to local)
+    const templateFiles = await fetchTemplate(template);
 
     // Render template (replace placeholders)
-    const renderedFiles = renderTemplate(files, {
+    const renderedFiles = renderTemplate(templateFiles, {
       projectName,
       options: (options as Record<string, boolean>) || {},
     });

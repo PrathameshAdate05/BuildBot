@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import { TemplateFile } from './templateLoader';
+import { TemplateFile } from './templateFetcher';
 
 export async function createZip(files: TemplateFile[]): Promise<Buffer> {
   const zip = new JSZip();

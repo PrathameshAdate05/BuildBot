@@ -1,5 +1,5 @@
 import Handlebars from 'handlebars';
-import { TemplateFile } from './templateLoader';
+import { TemplateFile } from './templateFetcher';
 
 export interface TemplateData {
   projectName: string;
